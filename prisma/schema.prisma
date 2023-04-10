@@ -1,0 +1,70 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  information   Information? @relation(fields: [informationID], references: [id])
+  informationID String?      @map("information_id") @db.ObjectId
+  auth          Auth?        @relation(fields: [authID], references: [id])
+  authID        String?      @map("auth_id") @db.ObjectId
+  address       Address?     @relation(fields: [addressID], references: [id])
+  addressID     String?      @db.ObjectId
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime?    @updatedAt
+
+  @@map("users")
+}
+
+model Information {
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  firstName        String
+  lastName         String
+  doc              String    @unique
+  docType          String
+  contactPhone     String
+  alternativePhone String?
+  observations     String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime? @updatedAt
+  user             User[]
+
+  @@map("informations")
+}
+
+model Auth {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  email       String    @unique
+  password    String
+  resetToken  String?
+  accessToken String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime? @updatedAt
+  user        User[]
+
+  @@map("auths")
+}
+
+model Address {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  street     String
+  number     Int
+  district   String
+  cep        String
+  city       String
+  state      String
+  complement String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime? @updatedAt
+  user       User[]
+
+  @@map("addresses")
+}
